@@ -7,8 +7,51 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id             String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  username       String @unique
+  email          String @unique
+  hashedPassword String
+  refreshToken   String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  posts Post[]
+}
+
+model Thread {
+  id          String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title       String
+  description String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  posts Post[]
+}
+
 model Post {
   id          String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   title       String
   description String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author   User?   @relation(fields: [authorId], references: [id])
+  authorId String? @db.Uuid
+
+  thread   Thread? @relation(fields: [threadId], references: [id])
+  threadId String? @db.Uuid
+
+  comments Comment[]
+}
+
+model Comment {
+  id      String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  content String
+
+  post   Post   @relation(fields: [postId], references: [id])
+  postId String @db.Uuid
 }
