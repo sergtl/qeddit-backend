@@ -17,7 +17,8 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  posts Post[]
+  posts   Post[]
+  Comment Comment[]
 }
 
 model Thread {
@@ -51,6 +52,12 @@ model Post {
 model Comment {
   id      String @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   content String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author   User   @relation(fields: [authorId], references: [id])
+  authorId String @db.Uuid
 
   post   Post   @relation(fields: [postId], references: [id])
   postId String @db.Uuid
