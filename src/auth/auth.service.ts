@@ -111,7 +111,13 @@ export class AuthService {
       throw new BadRequestException('User already exists');
     }
 
-    user = await this.usersService.create({ username, email, password });
+    const hashedPassword = await argon.hash(password);
+
+    user = await this.usersService.create({
+      username,
+      email,
+      password: hashedPassword,
+    });
 
     const tokens = await this.signTokens(user.id, user.email);
 
