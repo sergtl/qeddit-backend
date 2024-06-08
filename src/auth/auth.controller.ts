@@ -14,16 +14,25 @@ export class AuthController {
     @Body() { email, password }: LoginDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const tokens = await this.authService.login(email, password);
+    const { accessToken, refreshToken } = await this.authService.login(
+      email,
+      password,
+    );
 
-    res.cookie('refreshToken', tokens.refreshToken, {
+    res.cookie('accessToken', accessToken, {
+      secure: true,
+      sameSite: 'none',
+      maxAge: 1000 * 60 * 15,
+    });
+
+    res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
       maxAge: 1000 * 60 * 60 * 24 * 7,
     });
 
-    return { accessToken: tokens.accessToken };
+    return { success: true };
   }
 
   @Post('refresh')
@@ -32,19 +41,25 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const tokens = await this.authService.resetTokens(
+    const { accessToken, refreshToken } = await this.authService.resetTokens(
       req.user['sub'],
       req.user['refreshToken'],
     );
 
-    res.cookie('refreshToken', tokens.refreshToken, {
+    res.cookie('accessToken', accessToken, {
+      secure: true,
+      sameSite: 'none',
+      maxAge: 1000 * 60 * 15,
+    });
+
+    res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
       maxAge: 1000 * 60 * 60 * 24 * 7,
     });
 
-    return { accessToken: tokens.accessToken };
+    return { success: true };
   }
 
   // TODO
@@ -55,15 +70,25 @@ export class AuthController {
     @Body() { username, email, password }: RegisterDto,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const tokens = await this.authService.register(username, email, password);
+    const { accessToken, refreshToken } = await this.authService.register(
+      username,
+      email,
+      password,
+    );
 
-    res.cookie('refreshToken', tokens.refreshToken, {
+    res.cookie('accessToken', accessToken, {
+      secure: true,
+      sameSite: 'none',
+      maxAge: 1000 * 60 * 15,
+    });
+
+    res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
       maxAge: 1000 * 60 * 60 * 24 * 7,
     });
 
-    return { accessToken: tokens.accessToken };
+    return { success: true };
   }
 }

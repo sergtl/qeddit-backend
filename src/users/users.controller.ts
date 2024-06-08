@@ -1,4 +1,5 @@
 import {
+  Request,
   Controller,
   Get,
   Post,
@@ -6,14 +7,22 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @UseGuards(AccessTokenGuard)
+  @Get('me')
+  findMe(@Request() req) {
+    return req.user;
+  }
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
